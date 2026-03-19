@@ -11,7 +11,7 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ─── PASTE YOUR FREE GROQ API KEY HERE ───────────────────────────────────────
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "your-groq-api-key-here")"
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "your-groq-api-key-here")
 # ─────────────────────────────────────────────────────────────────────────────
 
 client = Groq(api_key=GROQ_API_KEY)
