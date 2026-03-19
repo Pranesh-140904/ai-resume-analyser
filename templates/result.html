@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="chat-container">
+
+    <div class="chat-box">
+
+        <div class="message bot">
+            <p><strong>Resume Score:</strong> {{ score }}/100</p>
+        </div>
+
+        <div class="message bot">
+            <p><strong>Skills:</strong></p>
+            <ul>
+                {% for skill in skills %}
+                <li>{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="message bot">
+            <p><strong>Suggestions:</strong></p>
+            <ul>
+                {% for s in suggestions %}
+                <li>{{ s }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="input-box">
+        <a href="/" class="back-btn">⬅ Back</a>
+    </div>
+
+</div>
+
+</body>
+</html>
