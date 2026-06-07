@@ -1,44 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Result</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analysis Results — AI Resume Analyser</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
 </head>
 <body>
 
-<div class="chat-container">
+<div class="container">
 
-    <div class="chat-box">
+  <header style="margin-bottom:32px">
+    <div class="badge"><span class="dot"></span> Analysis Complete</div>
+    <h1 style="font-size:clamp(28px,5vw,46px)">Your Results</h1>
+    <p class="subtitle">📄 {{ filename }}</p>
+  </header>
 
-        <div class="message bot">
-            <p><strong>Resume Score:</strong> {{ score }}/100</p>
-        </div>
+  <div class="scores-row">
+    <div class="score-card overall">
+      <div class="score-label">Overall Score</div>
+      <div class="score-num">{{ result.overall_score }}<span style="font-size:18px">/100</span></div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:{{ result.overall_score }}%"></div></div>
+    </div>
+    <div class="score-card ats">
+      <div class="score-label">ATS Score</div>
+      <div class="score-num">{{ result.ats_score }}<span style="font-size:18px">/100</span></div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:{{ result.ats_score }}%"></div></div>
+    </div>
+    <div class="score-card skills-card">
+      <div class="score-label">Skills Score</div>
+      <div class="score-num">{{ result.skills_score }}<span style="font-size:18px">/100</span></div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:{{ result.skills_score }}%"></div></div>
+    </div>
+    <div class="score-card match">
+      <div class="score-label">Job Match</div>
+      {% if result.job_match_score is not none %}
+        <div class="score-num">{{ result.job_match_score }}<span style="font-size:18px">/100</span></div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:{{ result.job_match_score }}%"></div></div>
+      {% else %}
+        <div class="score-num" style="font-size:20px;padding-top:8px">N/A</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px">No JD provided</p>
+      {% endif %}
+    </div>
+  </div>
 
-        <div class="message bot">
-            <p><strong>Skills:</strong></p>
-            <ul>
-                {% for skill in skills %}
-                <li>{{ skill }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+  <div class="detail-grid">
 
-        <div class="message bot">
-            <p><strong>Suggestions:</strong></p>
-            <ul>
-                {% for s in suggestions %}
-                <li>{{ s }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
+    <div class="detail-card full">
+      <div class="card-title"><div class="card-icon" style="background:rgba(108,99,255,0.15)">💡</div> Executive Summary</div>
+      <p class="summary-text">{{ result.summary }}</p>
     </div>
 
-    <div class="input-box">
-        <a href="/" class="back-btn">⬅ Back</a>
+    <div class="detail-card">
+      <div class="card-title"><div class="card-icon" style="background:rgba(108,99,255,0.15)">🛠</div> Skills Detected</div>
+      <div class="tags-wrap">
+        {% for skill in result.skills_found %}
+          <span class="tag skill">{{ skill }}</span>
+        {% else %}
+          <span class="muted-text">None detected</span>
+        {% endfor %}
+      </div>
     </div>
+
+    <div class="detail-card">
+      <div class="card-title"><div class="card-icon" style="background:rgba(255,101,132,0.12)">🎯</div> Missing / Suggested Skills</div>
+      <div class="tags-wrap">
+        {% for skill in result.missing_skills %}
+          <span class="tag missing">{{ skill }}</span>
+        {% else %}
+          <span class="muted-text">None identified</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="card-title"><div class="card-icon" style="background:rgba(67,233,123,0.1)">🤖</div> ATS Compatibility</div>
+      <div class="ats-checks">
+        {% for check in result.ats_checks %}
+          <div class="ats-item">
+            <div class="ats-dot {{ check.status }}"></div>
+            <div>
+              <strong>{{ check.label }}</strong>
+              {% if check.note %}<span class="ats-note">{{ check.note }}</span>{% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="card-title"><div class="card-icon" style="background:rgba(67,233,123,0.1)">🔑</div> Power Keywords Found</div>
+      <div class="tags-wrap">
+        {% for kw in result.power_keywords %}
+          <span class="tag keyword">{{ kw }}</span>
+        {% else %}
+          <span class="muted-text">None detected</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="card-title"><div class="card-icon" style="background:rgba(67,233,123,0.1)">💪</div> Strengths</div>
+      <ul class="feedback-list">
+        {% for s in result.strengths %}
+          <li class="feedback-item strength"><div class="fi-icon">✓</div><span>{{ s }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="detail-card">
+      <div class="card-title"><div class="card-icon" style="background:rgba(255,101,132,0.12)">⚠️</div> Weaknesses</div>
+      <ul class="feedback-list">
+        {% for w in result.weaknesses %}
+          <li class="feedback-item weakness"><div class="fi-icon">✗</div><span>{{ w }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="detail-card full">
+      <div class="card-title"><div class="card-icon" style="background:rgba(108,99,255,0.15)">🚀</div> Improvement Suggestions</div>
+      <ul class="feedback-list">
+        {% for sug in result.suggestions %}
+          <li class="feedback-item suggestion"><div class="fi-icon">→</div><span>{{ sug }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="action-row">
+    <a href="/" class="action-btn secondary">↩ New Analysis</a>
+    <a href="/chat" class="action-btn primary">💬 Chat with AI about my Resume</a>
+  </div>
 
 </div>
-
 </body>
 </html>
